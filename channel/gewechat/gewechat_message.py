@@ -367,7 +367,7 @@ class GeWeChatMessage(ChatMessage):
                         displayname = refermsg.find('displayname').text
                         quoted_content = refermsg.find('content').text
                         title = appmsg.find('title').text
-                        self.content = f"「引用内容\n{displayname}: {quoted_content}」\n{title}"
+                        self.content = f"「{displayname}: {quoted_content}」----------\n{title}"
                     else:
                         self.content = content_xml
                 elif msg_type is not None and msg_type.text == '5':  # 可能是公众号文章
@@ -432,6 +432,9 @@ class GeWeChatMessage(ChatMessage):
                         logger.error(f"[gewechat] Failed to parse group join XML: {e}")
                         # Fall back to regular content handling
                         pass
+        elif msg_type == 47:
+            self.ctype = ContextType.EMOJI
+            self.content = msg['Data']['Content']['string']
         else:
             raise NotImplementedError("Unsupported message type: Type:{}".format(msg_type))
 
@@ -456,8 +459,7 @@ class GeWeChatMessage(ChatMessage):
             }
             """
             # 获取实际发送者wxid
-            self.actual_user_id = self.msg.get('Data', {}).get('Content', {}).get('string', '').split(':', 1)[
-                0]  # 实际发送者ID
+            self.actual_user_id = self.msg.get('Data', {}).get('Content', {}).get('string', '').split(':', 1)[0]  # 实际发送者ID
             # 从群成员列表中获取实际发送者信息
             """
             {
@@ -480,8 +482,7 @@ class GeWeChatMessage(ChatMessage):
             }
             """
             chatroom_member_list_response = self.client.get_chatroom_member_list(self.app_id, self.from_user_id)
-            if chatroom_member_list_response.get('ret', 0) == 200 and chatroom_member_list_response.get('data', {}).get(
-                    'memberList', []):
+            if chatroom_member_list_response.get('ret', 0) == 200 and chatroom_member_list_response.get('data', {}).get('memberList', []):
                 # 从群成员列表中匹配acual_user_id
                 for member_info in chatroom_member_list_response['data']['memberList']:
                     if member_info['wxid'] == self.actual_user_id:
