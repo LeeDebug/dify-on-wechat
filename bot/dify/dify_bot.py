@@ -33,6 +33,8 @@ class DifyBot(Bot):
             if context.type == ContextType.IMAGE_CREATE:
                 query = conf().get('image_create_prefix', ['画'])[0] + query
             logger.info("[DIFY] query={}".format(query))
+            if "@所有人" in query or "@all" in query:
+                return
             session_id = context["session_id"]
             # TODO: 适配除微信以外的其他channel
             channel_type = conf().get("channel_type", "wx")
