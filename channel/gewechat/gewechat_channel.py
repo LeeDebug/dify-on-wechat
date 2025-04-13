@@ -108,14 +108,14 @@ class GeWeChatChannel(ChatChannel):
     def send(self, reply: Reply, context: Context):
         receiver = context["receiver"]
         gewechat_message = context.get("msg")
-        print("send > reply: ", reply)
-        print("send > context: ", context)
+        logger.info("send > reply: ", reply)
+        logger.info("send > context: ", context)
         if reply.type in [ReplyType.TEXT, ReplyType.ERROR, ReplyType.INFO]:
             ats = ""  # 初始化@（艾特）用户的内容为空
             if gewechat_message and gewechat_message.is_group:  # 判断是否是群聊消息
                 ats = gewechat_message.actual_user_id  # 如果是群消息，获取实际用户的ID来进行艾特
 
-            print("send > reply.type: ", reply.type)
+            logger.info("send > reply.type: ", reply.type)
             if (
                 reply.type == ReplyType.TEXT and
                 # 所有要排除的内容，即不需要分段输出的内容
@@ -123,17 +123,17 @@ class GeWeChatChannel(ChatChannel):
                 not any(keyword in context.content for keyword in ("总结聊天"))
             ):
                 # 使用正则表达式来分割消息
-                print("send > reply.content: ", reply.content)
+                logger.info("send > reply.content: ", reply.content)
                 split_punctuation = ['\n\n']  # 定义分隔符
                 pattern = '|'.join(map(lambda x: re.escape(x), split_punctuation))  # 构造正则表达式
                 split_messages = re.split(pattern, reply.content)  # 使用正则分割消息
-                print("send > split_messages: ", split_messages)
+                logger.info("send > split_messages: ", split_messages)
 
                 # 移除空行
                 split_messages = [msg.strip() for msg in split_messages if msg.strip() != '']
-                print("send > len(split_messages): ", len(split_messages))
+                logger.info("send > len(split_messages): ", len(split_messages))
                 for msg in split_messages:
-                    print("send > msg: ", msg)
+                    logger.info("send > msg: ", msg)
                     # 等待随机时间
                     r_time = random.uniform(1, 3)
                     time.sleep(r_time)
