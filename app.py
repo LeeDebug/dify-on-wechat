@@ -64,6 +64,9 @@ def run():
             time.sleep(1)
     except Exception as e:
         logger.error("App startup failed!")
+        conf().set("gewechat_app_id", "")
+        conf().set("gewechat_token", "")
+        logger.info("\n[run] gewechat_app_id and gewechat_token have been reset, please restart the project and log in again!\n")
         logger.exception(e)
 
 
